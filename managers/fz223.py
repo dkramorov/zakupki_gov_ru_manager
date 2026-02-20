@@ -3,7 +3,7 @@ import re
 from managers.simple_logger import json_pretty_print, logger
 
 
-rega_body_xml = re.compile('(&lt;ns2:purchaseNotice[EP]?(.+)&lt;/ns2:purchaseNotice[EP]?&gt;)', re.I+re.U+re.DOTALL)
+rega_body_xml = re.compile('(&lt;ns2:purchaseNotice([A-Z]*?)(.+)&lt;/ns2:purchaseNotice([A-Z]*?)&gt;)', re.I+re.U+re.DOTALL)
 
 
 class FZ223:
@@ -220,9 +220,8 @@ class FZ223:
             for item in items:
                 purchases = []
                 for el in item:
-                    if el.tag.endswith('purchaseNoticeEPData') or el.tag.endswith('purchaseNoticeData'):
+                    if 'purchaseNotice' in el.tag and el.tag.endswith('Data'):
                         purchases.append(el)
-                
                 for purchase in purchases:
                     for el in purchase:
                         print(el.tag, el.text)
