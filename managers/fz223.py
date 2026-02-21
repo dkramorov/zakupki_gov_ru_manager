@@ -1,6 +1,7 @@
 import html
 import re
 from managers.simple_logger import json_pretty_print, logger
+from managers.string_manager import camel2snake
 
 
 rega_body_xml = re.compile('(&lt;ns2:purchaseNotice([A-Z]*?)(.+)&lt;/ns2:purchaseNotice([A-Z]*?)&gt;)', re.I+re.U+re.DOTALL)
@@ -38,68 +39,47 @@ class FZ223:
                 for sub_item in sub_el:
                     items.append(sub_item)
         fill_to = self.data[key]
+        keys = (
+            'fullName', 'shortName', 'ico', 'inn', 'ogrn', 'legalAddress', 'postalAddress',
+            'okato', 'okopf', 'okopfName', 'okpo', 'okfs', 'okfsName', 'region',
+        )
         for sub_item in items:
-            if sub_item.tag.endswith('fullName'):
-                fill_to['full_name'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('shortName'):
-                fill_to['short_name'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('ico'):
-                fill_to['ico'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('inn'):
-                fill_to['inn'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('ogrn'):
-                fill_to['ogrn'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('legalAddress'):
-                fill_to['legal_address'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('postalAddress'):
-                fill_to['postal_address'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('okato'):
-                fill_to['okato'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('okopf'):
-                fill_to['okopf'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('okopfName'):
-                fill_to['okopf_name'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('okpo'):
-                fill_to['okpo'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('okfs'):
-                fill_to['okfs'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('okfsName'):
-                fill_to['okfs_name'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('timeZone'):
-                # offset, name sub elements
-                pass
-            elif sub_item.tag.endswith('region'):
-                fill_to['region'] = sub_item.text.strip()
+            for key in keys:
+                if sub_item.tag.endswith(key):
+                    fill_to[camel2snake(key)] = sub_item.text.strip()
+                    break
+            else:
+                if sub_item.tag.endswith('timeZone'):
+                    # offset, name sub elements
+                    pass
 
     def find_data_in_contact(self, el):
         """Вспомогательный метод для поиска данных в элементе customer
            :param el: элемент
         """
         fill_to = self.data['contact']
+        keys = (
+            'firstName', 'middleName', 'lastName', 'phone', 'email',
+        )
         for sub_item in el:
-            if sub_item.tag.endswith('firstName'):
-                fill_to['first_name'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('middleName'):
-                fill_to['middle_name'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('lastName'):
-                fill_to['last_name'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('phone'):
-                fill_to['phone'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('email'):
-                fill_to['email'] = sub_item.text.strip()
+            for key in keys:
+                if sub_item.tag.endswith(key):
+                    fill_to[camel2snake(key)] = sub_item.text.strip()
+                    break
 
     def find_data_in_trading_platform(self, el):
         """Вспомогательный метод для поиска данных в элементе electronicPlaceInfo
            :param el: элемент
         """
         fill_to = self.data['trading_platform']
+        keys = (
+            'name', 'url', 'electronicPlaceId', 'specialized',
+        )
         for sub_item in el:
-            if sub_item.tag.endswith('name'):
-                fill_to['name'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('url'):
-                fill_to['url'] = sub_item.text.strip()
-            elif sub_item.tag.endswith('electronicPlaceId'):
-                fill_to['electronicPlaceId'] = sub_item.text.strip()
+            for key in keys:
+                if sub_item.tag.endswith(key):
+                    fill_to[camel2snake(key)] = sub_item.text.strip()
+                    break
 
     def find_data_in_placing_procedure(self, el):
         """Вспомогательный метод для поиска данных в элементе placingProcedure
@@ -150,6 +130,8 @@ class FZ223:
                     self.find_data_in_common_el(el=lot_el, fill_to=lot_item['okei'])
                 elif lot_el.tag.endswith('qty'):
                     lot_item['qty'] = lot_el.text.strip()
+                elif lot_el.tag.endswith('additionalInfo'):
+                    lot_item['additional_info'] = lot_el.text.strip()
 
     def find_data_in_lots(self, el):
         """Вспомогательный метод для поиска данных в элементе lots
@@ -185,6 +167,8 @@ class FZ223:
                                     fill_to['lot_data']['currency']['name'] = sub_el.text.strip()
                         elif el.tag.endswith('initialSum'):
                             fill_to['initial_sum'] = el.text.strip()
+                        elif el.tag.endswith('orderPricing'):
+                            fill_to['order_pricing'] = el.text.strip()
                         elif el.tag.endswith('deliveryPlace'):
                             fill_to['lot_data']['delivery_place'] = {}
                             for sub_el in el:

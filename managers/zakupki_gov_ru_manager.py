@@ -1,3 +1,4 @@
+import html
 import logging
 import os
 import re
@@ -202,6 +203,11 @@ class ZakupkiGovRuManager:
         if not self.common_page:
             return
 
+        if self.fz.data.get('customer'):
+            for k, v in self.fz.data['customer'].items():
+                if not k in self.fz.result['customer']:
+                    self.fz.result['customer'][k] = v
+
         # Поиск информации о заказчике
         # <a href="https://zakupki.gov.ru/epz/organization/view/info.html?organizationId=803457"...></a>
         search_org_link = self.fz.rega_org_id.search(self.common_page)
@@ -217,4 +223,4 @@ class ZakupkiGovRuManager:
                 search_short_name = rega_short_name.search(text)
                 if search_short_name:
                     short_name = search_short_name[1]
-                    self.fz.result['customer']['short_name'] = short_name
+                    self.fz.result['customer']['short_name'] = html.unescape(short_name)

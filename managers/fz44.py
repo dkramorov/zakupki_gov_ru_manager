@@ -93,12 +93,18 @@ class FZ44:
         terms_and_funding_info = self.data.get('Информация о сроках исполнения контракта и источниках финансирования', {})
         buy_process_info = self.data.get('Информация о процедуре закупки', {})
         contact_info = self.data.get('Контактная информация', {})
+        finance_from_budgetary_funds = self.data.get('Финансирование за счет бюджетных средств', {})
 
         print(json_pretty_print(self.data))
 
+        code_key = 'Идентификационный код закупки'
+
         self.result = {
             'auction_number': main_info.get('Номер извещения'),
-            'code': misc.get('Идентификационный код закупки'),
+            'code': (
+                misc.get(code_key) or
+                finance_from_budgetary_funds.get(code_key)
+            ),
             'name': main_info.get('Наименование объекта закупки'),
             'federal_law': self.name,
             'lots_сount': None, # не нашел c лотами
