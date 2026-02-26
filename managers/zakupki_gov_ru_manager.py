@@ -1,3 +1,4 @@
+import datetime
 import html
 import logging
 import os
@@ -224,3 +225,46 @@ class ZakupkiGovRuManager:
                 if search_short_name:
                     short_name = search_short_name[1]
                     self.fz.result['customer']['short_name'] = html.unescape(short_name)
+
+
+class ZakupkiGovRuCacher:
+    """Кэширование данных
+    """
+    updated = None
+    ttl = 60*60*3
+    objs = {}
+    debug = False
+
+    def __init__(self, ttl: int = 60*60*3):
+        self.ttl = ttl
+        self.objs = {}
+
+    def check_expired(self):
+        """Удаление просроченных объектов
+        """
+        now = datetime.datetime.utcnow()
+        expired_before_datetime = now - datetime.timedelta(minutes=self.ttl)
+        self.objs = {k: v for k, v in self.objs.items() if v['updated'] > expired_before_datetime}
+
+    def get_by_number(self, number: str):
+        """Получение по номеру записи из кэша
+           :param number: номер извещения
+        """
+        self.check_expired()
+        number = str(number)
+        if self.objs.get(number):
+            logger.info('ZakupkiGovRuCacher from cache %s' % number)
+            return self.objs[number]['data']
+
+        logger.info('ZakupkiGovRuCacher request %s' % number)
+        zgrm = ZakupkiGovRuManager()
+        zgrm.get_by_number(number=number)
+        if zgrm.fz.result:
+            self.objs[number] = {
+                'updated': datetime.datetime.utcnow(),
+                'data': zgrm.fz.result,
+            }
+        return zgrm.fz.result
+
+
+zakupki_gov_ru_cacher = ZakupkiGovRuCacher()

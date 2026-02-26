@@ -233,16 +233,16 @@ class FZ223:
                             self.find_data_in_lots(el=el)
 
     def fill_result(self):
-        """Заполнение данных по 44ФЗ
+        """Заполнение данных по 223ФЗ
         """
-        print(json_pretty_print(self.data))
+        #print(json_pretty_print(self.data))
 
         self.result = {
             'auction_number': self.data['main'].get('registrationNumber'),
             #'code': misc.get('Идентификационный код закупки'),
             'name': self.data['main'].get('name'),
             'federal_law': self.name,
-            'lots_сount': len(self.data['lots']),
+            'lots_count': len(self.data['lots']),
             #'amount': self.get_money(cond_info.get('Начальная (максимальная) цена контракта')),
             #'guarantee_amount': self.get_money(provision_info.get('Размер обеспечения заявки')),
             #'guarantee_execution_amount': self.get_money(provision_execution_info.get('Размер обеспечения исполнения контракта')),

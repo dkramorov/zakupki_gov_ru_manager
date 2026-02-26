@@ -95,7 +95,7 @@ class FZ44:
         contact_info = self.data.get('Контактная информация', {})
         finance_from_budgetary_funds = self.data.get('Финансирование за счет бюджетных средств', {})
 
-        print(json_pretty_print(self.data))
+        #print(json_pretty_print(self.data))
 
         code_key = 'Идентификационный код закупки'
 
@@ -107,7 +107,7 @@ class FZ44:
             ),
             'name': main_info.get('Наименование объекта закупки'),
             'federal_law': self.name,
-            'lots_сount': None, # не нашел c лотами
+            'lots_count': None, # не нашел c лотами
             'amount': self.get_money(cond_info.get('Начальная (максимальная) цена контракта')),
             'guarantee_amount': self.get_money(provision_info.get('Размер обеспечения заявки')),
             'guarantee_execution_amount': self.get_money(provision_execution_info.get('Размер обеспечения исполнения контракта')),
