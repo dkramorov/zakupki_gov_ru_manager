@@ -103,11 +103,11 @@ class FZ44:
             'auction_number': main_info.get('Номер извещения'),
             'code': (
                 misc.get(code_key) or
-                finance_from_budgetary_funds.get(code_key)
+                finance_from_budgetary_funds.get(code_key) or
+                cond_info.get(code_key)
             ),
             'name': main_info.get('Наименование объекта закупки'),
             'federal_law': self.name,
-            'lots_count': None, # не нашел c лотами
             'amount': self.get_money(cond_info.get('Начальная (максимальная) цена контракта')),
             'guarantee_amount': self.get_money(provision_info.get('Размер обеспечения заявки')),
             'guarantee_execution_amount': self.get_money(provision_execution_info.get('Размер обеспечения исполнения контракта')),

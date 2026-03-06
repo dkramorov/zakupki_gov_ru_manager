@@ -14,7 +14,7 @@ from .fz223 import FZ223
 rega_inn = re.compile('<div class="registry-entry__body-title">ИНН</div>.+?<div class="registry-entry__body-value">([0-9]+)</div>', re.I+re.U+re.DOTALL)
 rega_short_name = re.compile('<span class="section__title">Сокращенное наименование</span>.+?<span class="section__info">([^<]+)</span>', re.I+re.U+re.DOTALL)
 rega_print_link = re.compile('<a[^>]+?href="([^\"]+)"[^>]+?>[^<]+?<img[^>]+?src="/epz/static/img/icons/icon_print_small.svg"', re.I+re.U+re.DOTALL)
-
+rega_rss_link = re.compile('<a class="subscribeRss__link" href="([^\"]+)"', re.I+re.U+re.DOTALL)
 
 class ZakupkiGovRuManager:
     """zakupki.gov.ru менеджер
@@ -225,6 +225,14 @@ class ZakupkiGovRuManager:
                 if search_short_name:
                     short_name = search_short_name[1]
                     self.fz.result['customer']['short_name'] = html.unescape(short_name)
+        search_rss_link = rega_rss_link.search(self.common_page)
+        if search_rss_link and self.fz.fz_id == 223:
+            # В 223 ссылки могут не содержать номера извещения, поэтому формируем ид из rss ссылки
+            rss_link = search_rss_link[1]
+            if '?id=' in rss_link:
+                rss_id = rss_link.split('?id=')[-1].split('&')[0]
+                if rss_id not in self.fz.result['auction_link']:
+                    self.fz.result['auction_link'] = '%s/epz/order/notice/notice223/common-info.html?noticeInfoId=%s' % (self.domain, rss_id)
 
 
 class ZakupkiGovRuCacher:

@@ -179,6 +179,9 @@ class FZ223:
                             self.find_data_in_lot_items(el=el, fill_to=fill_to['lot_data']['lot_items'])
                         elif el.tag.endswith('forSmallOrMiddle'):
                             fill_to['for_small_or_middle'] = el.text.strip()
+                        elif el.tag.endswith('applicationSupplySumm'):
+                            # Размер обеспечения заявки
+                            fill_to['application_supply_summ'] = el.text.strip()
 
     def find_data(self, body_html):
         """Находим данные по 223ФЗ
@@ -237,13 +240,16 @@ class FZ223:
         """
         #print(json_pretty_print(self.data))
 
+        amount_sum = 0
+        for lot in self.data['lots']:
+            if lot.get('initial_sum'):
+                amount_sum += float(lot['initial_sum'])
         self.result = {
             'auction_number': self.data['main'].get('registrationNumber'),
             #'code': misc.get('Идентификационный код закупки'),
             'name': self.data['main'].get('name'),
             'federal_law': self.name,
-            'lots_count': len(self.data['lots']),
-            #'amount': self.get_money(cond_info.get('Начальная (максимальная) цена контракта')),
+            'amount': amount_sum if amount_sum else None,
             #'guarantee_amount': self.get_money(provision_info.get('Размер обеспечения заявки')),
             #'guarantee_execution_amount': self.get_money(provision_execution_info.get('Размер обеспечения исполнения контракта')),
             #'guarantee_warranty_amount': None, # TODO: найти
@@ -271,7 +277,7 @@ class FZ223:
                 #'lotAmountType': None,
                 'lot_amount': lot.get('initial_sum'),
                 #'lotAmountDescription': None,
-                #'lotGuaranteeAmount': None,
+                'lot_guarantee_amount': lot.get('application_supply_summ'),
                 #'lotGuaranteeDescription': None,
                 #'lotGuaranteeExecutionAmount': None,
                 #'lotGuaranteeExecutionDescription': None,
