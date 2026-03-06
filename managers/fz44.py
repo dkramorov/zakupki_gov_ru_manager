@@ -85,15 +85,15 @@ class FZ44:
     def fill_result(self):
         """Заполнение данных по 44ФЗ
         """
-        main_info = self.data.get('Общая информация', {})
         misc = self.data.get('misc', {})
-        cond_info = self.data.get('Условия контракта', {})
+        main_info = self.data.get('Общая информация', {})
+        contact_info = self.data.get('Контактная информация', {})
+        buy_process_info = self.data.get('Информация о процедуре закупки', {})
+        finance_from_budgetary_funds = self.data.get('Финансирование за счет бюджетных средств', {})
+        cond_info = self.data.get('Условия контракта', self.data.get('Условия контрактов', {}))
+        terms_and_funding_info = self.data.get('Информация о сроках исполнения контракта и источниках финансирования', {})
         provision_info = self.data.get('Обеспечение заявки', {})
         provision_execution_info = self.data.get('Обеспечение исполнения контракта', {})
-        terms_and_funding_info = self.data.get('Информация о сроках исполнения контракта и источниках финансирования', {})
-        buy_process_info = self.data.get('Информация о процедуре закупки', {})
-        contact_info = self.data.get('Контактная информация', {})
-        finance_from_budgetary_funds = self.data.get('Финансирование за счет бюджетных средств', {})
 
         #print(json_pretty_print(self.data))
 
