@@ -108,7 +108,10 @@ class FZ44:
             ),
             'name': main_info.get('Наименование объекта закупки'),
             'federal_law': self.name,
-            'amount': self.get_money(cond_info.get('Начальная (максимальная) цена контракта')),
+            'amount': self.get_money(
+                cond_info.get('Начальная (максимальная) цена контракта') or
+                cond_info.get('Максимальное значение цены контракта')
+            ),
             'guarantee_amount': self.get_money(provision_info.get('Размер обеспечения заявки')),
             'guarantee_execution_amount': self.get_money(provision_execution_info.get('Размер обеспечения исполнения контракта')),
             'guarantee_warranty_amount': None, # TODO: найти
